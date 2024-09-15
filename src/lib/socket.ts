@@ -31,7 +31,11 @@ export function startWs(server: any) {
       socket.join(channelId);
       channels.push({ userId: username, id: channelId });
       console.info({ channels });
-      socket.emit(Events.USERS, users);
+      // emit to only channel
+      io.to(channelId).emit(
+        Events.USERS,
+        channels.filter((u) => u.id === channelId)
+      );
     });
 
     socket.on(Events.DISCONNECT, () => {
