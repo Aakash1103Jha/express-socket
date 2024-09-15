@@ -5,4 +5,5 @@ export enum Events {
   LOGOUT = 'logout',
   ACTIVE = 'active',
   INACTIVE = 'inactive',
+  USERS = 'users',
 }
