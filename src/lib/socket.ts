@@ -3,7 +3,13 @@ import { Server } from 'socket.io';
 import { Events } from '../constants/Events';
 import User from '../models/User';
 
-const channels: Record<string, User[]> = {};
+const ChannelList = [
+  { id: '1', name: 'Channel 1' },
+  { id: '2', name: 'Channel 2' },
+];
+
+const users: Record<'username' | 'id', string>[] = [];
+const channels: Record<'userId' | 'id', string>[] = [];
 
 export function startWs(server: any) {
   const io = new Server(server, { cors: { origin: '*' } });
@@ -11,23 +17,23 @@ export function startWs(server: any) {
   io.on(Events.CONNECTION, (socket) => {
     console.info('User connected');
 
-    socket.on(Events.LOGIN, ({ username, siteId }) => {
-      console.info({ username, siteId });
-      // check if channel exists
-      const c = channels[siteId];
-      if (!c) {
-        channels[siteId] = [];
-        console.log(channels);
-      }
-      // check if user exists in channel
-      const user = channels[siteId].find((u) => u.username === username);
-      console.info(user);
-      if (user) return;
-      // add user to channel
-      channels[siteId].push(new User(username, siteId));
-      socket.join(siteId);
-      socket.broadcast.to(siteId).emit(Events.USERS, channels[siteId]);
+    socket.on(Events.LOGIN, ({ username }) => {
+      console.info('User logged in', username);
+      socket.emit(Events.CHANNELS, ChannelList);
     });
+
+    socket.on(Events.JOIN_CHANNEL, ({ username, channelId }) => {
+      const isUserInChannel = users.some((user) => user.username === username);
+      if (isUserInChannel) {
+        socket.emit(Events.ERROR, 'User already exists');
+        return;
+      }
+      socket.join(channelId);
+      channels.push({ userId: username, id: channelId });
+      console.info({ channels });
+      socket.emit(Events.USERS, users);
+    });
+
     socket.on(Events.DISCONNECT, () => {
       console.info('User disconnected');
     });

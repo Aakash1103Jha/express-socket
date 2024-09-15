@@ -6,4 +6,7 @@ export enum Events {
   ACTIVE = 'active',
   INACTIVE = 'inactive',
   USERS = 'users',
+  CHANNELS = 'channels',
+  ERROR = 'error',
+  JOIN_CHANNEL = 'join_channel',
 }
