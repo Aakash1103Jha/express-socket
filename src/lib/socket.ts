@@ -23,7 +23,7 @@ export function startWs(server: any) {
     });
 
     socket.on(Events.JOIN_CHANNEL, ({ username, channelId }) => {
-      const isUserInChannel = users.some((user) => user.username === username);
+      const isUserInChannel = channels.some((user) => user.userId === username);
       if (isUserInChannel) {
         socket.emit(Events.ERROR, 'User already exists');
         return;
